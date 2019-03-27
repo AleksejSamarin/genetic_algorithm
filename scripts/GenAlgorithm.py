@@ -7,14 +7,16 @@ class GenAlgorithm:
     def __init__(self):
         self.max = 3
         self.min = -3
-        self.population_count = 10 # 50 / 4
-        self.chromosome_length = 20 # 20 / 5
+        self.chromosome_count = 2
+        self.type_length = 5 # 20 / 5
+        self.population_count = 4 # 50 / 4
         self.factor_crossover = 0.5
         self.factor_mutation = 0.15
-        self.factor_avoid_zero_probability = 0.001
 
+        self.factor_avoid_zero_probability = 0.001
+        self.chromosome_length = self.chromosome_count * self.type_length
         self.area = self.max - self.min
-        self.chunk_value = self.area / (2**self.chromosome_length - 1)
+        self.chunk_value = self.area / (2**self.type_length - 1)
         self.chromosomes = np.random.randint(2, size=(self.population_count, self.chromosome_length))
 
 
@@ -22,13 +24,15 @@ class GenAlgorithm:
         return math.cos(1.2 * x - 2) - math.cos(1.7 * x - 1) * math.sin(8.4 * x)
 
 
-    def run(self):
-        for i in range(100):
+    def count_function_3d(self, x, y):
+        return 0.1 * x + 0.2 * y - 4 * math.cos(x) + 4 * math.cos(0.9 * y) + 5
 
+
+    def run(self):
+        for i in range(10):
             np.random.shuffle(self.chromosomes)
             factors_crossover = np.random.rand(int(self.population_count / 2))
             # print(factors_crossover)
-
             children = []
             for idx in range(0, self.population_count, 2):
                 if factors_crossover[int(idx / 2)] < self.factor_crossover:
@@ -42,10 +46,15 @@ class GenAlgorithm:
                     # print(crossover_location, children)
                     self.chromosomes = np.append(self.chromosomes, children, axis=0)
                     children.clear()
-
             # print(chromosomes)
-            result_values = self.chromosomes.dot(1 << np.arange(self.chromosomes.shape[-1] - 1, -1, -1)) * self.chunk_value + self.min # start, end (not included), step
-            function_values = np.vectorize(self.count_function)(result_values) # apply function to elements
+            if self.chromosome_count == 1:
+                result_values = self.chromosomes.dot(1 << np.arange(self.chromosomes.shape[-1] - 1, -1, -1)) * self.chunk_value + self.min # start, end (not included), step
+                function_values = np.vectorize(self.count_function)(result_values) # apply function to elements
+            else:
+                reshaped_chromosomes = self.chromosomes.reshape((self.chromosomes.shape[0] * 2, int(self.chromosomes.shape[1] / 2)))
+                result_values = reshaped_chromosomes.dot(1 << np.arange(int(self.chromosome_length / 2) - 1, -1, -1)) * self.chunk_value + self.min
+                function_values = np.vectorize(self.count_function_3d)(result_values[::2], result_values[1:][::2])
+                # print(self.chromosomes, result_values, function_values, sep='\n')
 
             probabilities_prepare = function_values + np.abs(np.min(function_values)) + self.factor_avoid_zero_probability
             probabilities = probabilities_prepare / np.sum(probabilities_prepare)
