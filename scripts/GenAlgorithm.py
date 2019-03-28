@@ -28,7 +28,6 @@ class GenAlgorithm:
         for i in range(self.iterations):
             np.random.shuffle(self.chromosomes)
             factors_crossover = np.random.rand(int(self.population_count / 2))
-            # print(factors_crossover)
             children = []
             for idx in range(0, self.population_count, 2):
                 if factors_crossover[int(idx / 2)] < self.factor_crossover:
@@ -39,10 +38,8 @@ class GenAlgorithm:
                     for index, child in enumerate(children):
                         if factors_mutation[index] < self.factor_mutation:
                             child[random.randint(0, self.chromosome_length - 1)] ^= 1
-                    # print(crossover_location, children)
                     self.chromosomes = np.append(self.chromosomes, children, axis=0)
                     children.clear()
-            # print(chromosomes)
             if self.chromosome_count == 1:
                 result_values = self.chromosomes.dot(1 << np.arange(self.chromosomes.shape[-1] - 1, -1, -1)) * self.chunk_value + self.min # start, end (not included), step
                 function_values = np.vectorize(self.count_function)(result_values) # apply function to elements
@@ -50,7 +47,6 @@ class GenAlgorithm:
                 reshaped_chromosomes = self.chromosomes.reshape((self.chromosomes.shape[0] * 2, int(self.chromosomes.shape[1] / 2)))
                 result_values = reshaped_chromosomes.dot(1 << np.arange(int(self.chromosome_length / 2) - 1, -1, -1)) * self.chunk_value + self.min
                 function_values = np.vectorize(self.count_function_3d)(result_values[::2], result_values[1:][::2])
-                # print(self.chromosomes, result_values, function_values, sep='\n')
 
             if plot_3d is False:
                 probabilities_prepare = function_values + np.abs(np.min(function_values)) + self.factor_avoid_zero_probability
@@ -73,6 +69,18 @@ class GenAlgorithm:
 
             self.chromosomes = self.chromosomes[new_population_indices]
 
+            if i == 0 or i == 3 or i == self.iterations - 1:
+                for idx in range(self.population_count):
+                    if plot_3d is False:
+                        print(i, idx, '{:0.2f}'.format(result_values[idx]),
+                              np.array2string(self.chromosomes[idx], separator=''),
+                              '{:0.2f}'.format(function_values[idx], decimals=2), sep='\t')
+                    else:
+                        print(i, idx, '{:0.2f}'.format(result_values[::2][idx]),
+                              '{:0.2f}'.format(result_values[1:][::2][idx]),
+                              np.array2string(self.chromosomes[idx], separator=''),
+                              np.around(function_values[idx]), sep='\t')
+
             if self.chromosome_count == 1:
                 result_values = self.chromosomes.dot(1 << np.arange(self.chromosomes.shape[-1] - 1, -1, -1)) * self.chunk_value + self.min  # start, end (not included), step
                 function_values = np.vectorize(self.count_function)(result_values)
@@ -82,7 +90,6 @@ class GenAlgorithm:
                 result_values = reshaped_chromosomes.dot(1 << np.arange(int(self.chromosome_length / 2) - 1, -1, -1)) * self.chunk_value + self.min
                 function_values = np.vectorize(self.count_function_3d)(result_values[::2], result_values[1:][::2])
                 self.window.update_plot(function_values, result_values[::2], result_values[1:][::2])
-        # print(self.chromosomes)
 
 
     def prepare(self, plot_3d):
