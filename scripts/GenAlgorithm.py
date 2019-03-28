@@ -72,14 +72,15 @@ class GenAlgorithm:
             if i == 0 or i == 3 or i == self.iterations - 1:
                 for idx in range(self.population_count):
                     if plot_3d is False:
-                        print(i, idx, '{:0.2f}'.format(result_values[idx]),
+                        print(i, idx, '{:0.1f}'.format(result_values[idx]),
                               np.array2string(self.chromosomes[idx], separator=''),
-                              '{:0.2f}'.format(function_values[idx], decimals=2), sep='\t')
+                              '{:0.1f}'.format(function_values[idx]), sep='\t')
                     else:
-                        print(i, idx, '{:0.2f}'.format(result_values[::2][idx]),
-                              '{:0.2f}'.format(result_values[1:][::2][idx]),
+                        print(i, idx, '{:0.1f}'.format(result_values[::2][idx]),
+                              '{:0.1f}'.format(result_values[1:][::2][idx]),
                               np.array2string(self.chromosomes[idx], separator=''),
-                              np.around(function_values[idx]), sep='\t')
+                              '{:0.1f}'.format(function_values[idx]), sep='\t')
+                print('Average fitness: {:0.1f}'.format(np.mean(function_values)))
 
             if self.chromosome_count == 1:
                 result_values = self.chromosomes.dot(1 << np.arange(self.chromosomes.shape[-1] - 1, -1, -1)) * self.chunk_value + self.min  # start, end (not included), step
