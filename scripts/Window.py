@@ -20,8 +20,8 @@ class Window():
         self.plot_3d.build(alg.get_base_data_plot(True))
         alg.set_window(self)
 
-        self.root.bind("<z>", lambda l: self.run(alg, 1))
-        self.root.bind("<x>", lambda l: self.run(alg, 2))
+        self.root.bind("<z>", lambda l: self.run(alg))
+        self.root.bind("<x>", lambda l: self.run(alg, True))
         self.root.bind("<Escape>", self.exit)
 
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
@@ -37,8 +37,8 @@ class Window():
             self.plot_3d.draw(args[0], args[1], args[2])
 
 
-    def run(self, alg, action):
-        alg.run(action)
+    def run(self, alg, plot_3d=False):
+        alg.run(plot_3d)
 
 
     def exit(self, event=None):

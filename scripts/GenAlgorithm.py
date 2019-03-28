@@ -5,17 +5,14 @@ import math
 class GenAlgorithm:
 
     def __init__(self):
-        self.max = 3
-        self.min = -3
-        self.type_length = 20 # 20 / 5
-        self.population_count = 50 # 50 / 4
+        self.edge_1 = 3
+        self.edge_2 = 6
+        self.type_length = 20
+        self.population_count = 50
         self.factor_crossover = 0.5
         self.factor_mutation = 0.15
         self.iterations = 100
-
         self.factor_avoid_zero_probability = 0.001
-        self.area = self.max - self.min
-        self.chunk_value = self.area / (2 ** self.type_length - 1)
 
 
     def count_function(self, x):
@@ -26,8 +23,8 @@ class GenAlgorithm:
         return 0.1 * x + 0.2 * y - 4 * math.cos(x) + 4 * math.cos(0.9 * y) + 5
 
 
-    def run(self, count):
-        self.prepare(count)
+    def run(self, plot_3d=False):
+        self.prepare(plot_3d)
         for i in range(self.iterations):
             np.random.shuffle(self.chromosomes)
             factors_crossover = np.random.rand(int(self.population_count / 2))
@@ -72,13 +69,23 @@ class GenAlgorithm:
         # print(self.chromosomes)
 
 
-    def prepare(self, count):
-        self.chromosome_count = count
+    def prepare(self, plot_3d):
+        if plot_3d is True:
+            self.chromosome_count = 2
+            self.edge = self.edge_2
+        else:
+            self.chromosome_count = 1
+            self.edge = self.edge_1
         self.chromosome_length = self.chromosome_count * self.type_length
         self.chromosomes = np.random.randint(2, size=(self.population_count, self.chromosome_length))
+        self.max = self.edge
+        self.min = -self.edge
+        self.area = self.max - self.min
+        self.chunk_value = self.area / (2 ** self.type_length - 1)
 
 
     def get_base_data_plot(self, plot_3d=False):
+        self.prepare(plot_3d)
         x = np.arange(self.min, self.max, self.area / (self.population_count * 2))
         if plot_3d is True:
             y = np.copy(x)
