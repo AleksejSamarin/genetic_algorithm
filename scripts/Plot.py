@@ -35,7 +35,7 @@ class Plot:
         else:
             self.counter += 1
             if self.counter % self.iterations > self.iterations - 2:
-                self.plot.scatter(x, y, function)
+                self.plot.scatter(x, y, function) # alpha=0.1
                 self.canvas.draw()
 
 

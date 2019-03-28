@@ -9,7 +9,7 @@ class GenAlgorithm:
         self.edge_2 = 6
         self.type_length = 20
         self.population_count = 50
-        self.factor_crossover = 0.5
+        self.factor_crossover = 0.85
         self.factor_mutation = 0.15
         self.iterations = 100
         self.factor_avoid_zero_probability = 0.001
@@ -52,9 +52,25 @@ class GenAlgorithm:
                 function_values = np.vectorize(self.count_function_3d)(result_values[::2], result_values[1:][::2])
                 # print(self.chromosomes, result_values, function_values, sep='\n')
 
-            probabilities_prepare = function_values + np.abs(np.min(function_values)) + self.factor_avoid_zero_probability
-            probabilities = probabilities_prepare / np.sum(probabilities_prepare)
-            new_population_indices = np.random.choice(probabilities.size, self.population_count, replace=False, p=probabilities)
+            if plot_3d is False:
+                probabilities_prepare = function_values + np.abs(np.min(function_values)) + self.factor_avoid_zero_probability
+                probabilities = probabilities_prepare / np.sum(probabilities_prepare)
+                new_population_indices = np.random.choice(probabilities.size, self.population_count, replace=False, p=probabilities)
+            else:
+                flag = True
+                new_population_indices = []
+                temp = np.copy(function_values)
+                while flag:
+                    for idx in range(0, temp.size, 2):
+                        if len(new_population_indices) < self.population_count:
+                            if temp[idx] > temp[idx + 1]:
+                                new_population_indices.append(idx)
+                            else:
+                                new_population_indices.append(idx + 1)
+                        else:
+                            flag = False
+                    np.delete(temp, new_population_indices)
+
             self.chromosomes = self.chromosomes[new_population_indices]
 
             if self.chromosome_count == 1:
