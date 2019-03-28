@@ -11,6 +11,7 @@ class GenAlgorithm:
         self.population_count = 50 # 50 / 4
         self.factor_crossover = 0.5
         self.factor_mutation = 0.15
+        self.iterations = 100
 
         self.factor_avoid_zero_probability = 0.001
         self.area = self.max - self.min
@@ -27,7 +28,7 @@ class GenAlgorithm:
 
     def run(self, count):
         self.prepare(count)
-        for i in range(50):
+        for i in range(self.iterations):
             np.random.shuffle(self.chromosomes)
             factors_crossover = np.random.rand(int(self.population_count / 2))
             # print(factors_crossover)
@@ -75,6 +76,17 @@ class GenAlgorithm:
         self.chromosome_count = count
         self.chromosome_length = self.chromosome_count * self.type_length
         self.chromosomes = np.random.randint(2, size=(self.population_count, self.chromosome_length))
+
+
+    def get_base_data_plot(self, plot_3d=False):
+        x = np.arange(self.min, self.max, self.area / (self.population_count * 2))
+        if plot_3d is True:
+            y = np.copy(x)
+            x, y = np.meshgrid(x, y)
+            results = np.vectorize(self.count_function_3d)(x, y)
+            return x, y, results
+        results = np.vectorize(self.count_function)(x)
+        return x, results
 
 
     def set_window(self, window):

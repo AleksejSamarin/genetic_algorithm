@@ -14,8 +14,10 @@ class Window():
         self.f_right.pack(side=tkinter.LEFT)
         self.f_left.pack(side=tkinter.LEFT)
         warnings.filterwarnings("ignore")
-        self.plot_2d = Plot(self.root, self.f_right)
-        self.plot_3d = Plot(self.root, self.f_left, True)
+        self.plot_2d = Plot(self.f_right, alg.iterations)
+        self.plot_3d = Plot(self.f_left, alg.iterations, True)
+        self.plot_2d.build(alg.get_base_data_plot())
+        self.plot_3d.build(alg.get_base_data_plot(True))
         alg.set_window(self)
 
         self.root.bind("<z>", lambda l: self.run(alg, 1))
